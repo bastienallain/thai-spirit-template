@@ -23,12 +23,14 @@ const PostLayout = ({ params }: { params: ParamsType }) => {
   const Content = getMDXComponent(post.body.code);
 
   return (
-    <article className="py-8 mx-auto max-w-xl">
+    <article className=" mx-auto">
       <div className="mb-8 text-center">
         <Image
           alt={post.title}
           className="z-0 w-full h-full object-cover"
-          src={post.coverImage || "/default-cover.jpg"}
+          src={post.coverImage || "/test.jpeg"}
+          height={1200}
+          width={900}
         />
         <time dateTime={post.date} className="mb-1 text-xs text-gray-600">
           {format(parseISO(post.date), "LLLL d, yyyy")}

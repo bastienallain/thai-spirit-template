@@ -15,6 +15,21 @@ const Post = defineDocumentType(() => ({
       description: 'The date of the post',
       required: true,
     },
+    coverImage: { // Ajout de ce champ
+      type: 'string',
+      description: 'The cover image of the post',
+      required: false,
+    },
+    thumbnailImage:{ // Ajout de ce champ
+        type: 'string',
+        description: 'The cover image of the post',
+        required: false,
+      },
+    category: { // Ajout de ce champ
+      type: 'string',
+      description: 'The category of the post',
+      required: false,
+    },
   },
   computedFields: {
     url: {
