@@ -106,7 +106,7 @@ export default function BlogPage() {
           )}
         </script>
       </Head>
-      <div className="max-w-[1600px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
+      <div className="max-w-[1920px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
         <h1 className="col-span-12 mb-8 text-3xl font-bold text-center">
           Next.js Example
         </h1>

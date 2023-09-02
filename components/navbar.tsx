@@ -1,4 +1,5 @@
 "use client";
+import React, { useState } from "react";
 import {
   Navbar as NextUINavbar,
   NavbarContent,
@@ -7,22 +8,15 @@ import {
   NavbarBrand,
   NavbarItem,
   NavbarMenuItem,
-} from "@nextui-org/navbar";
-import { Button } from "@nextui-org/button";
-import { Kbd } from "@nextui-org/kbd";
-import { Link } from "@nextui-org/link";
-import { Input } from "@nextui-org/input";
-import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
   DropdownItem,
 } from "@nextui-org/react";
-import { link as linkStyles } from "@nextui-org/theme";
-
-import { siteConfig } from "@/config/site";
-import NextLink from "next/link";
-import clsx from "clsx";
+import { Button } from "@nextui-org/button";
+import { Kbd } from "@nextui-org/kbd";
+import { Link } from "@nextui-org/link";
+import { Input } from "@nextui-org/input";
 
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -32,29 +26,50 @@ import {
   HeartFilledIcon,
   SearchIcon,
 } from "@/components/icons";
-
 import { Logo } from "@/components/icons";
+import { siteConfig } from "@/config/site";
+import NextLink from "next/link";
+import { allPosts } from "contentlayer/generated";
 
-import { allPosts } from "contentlayer/generated"; // importez vos posts
-import { useState } from "react";
 export const Navbar = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const filteredPosts = allPosts.filter(
-    (post) => post.language === "fr" && post.title.includes(searchTerm)
+
+  const validPosts = allPosts.filter(
+    (post) => post && post.catMenu && post.catCity && post.category
   );
-  const menuData = allPosts.reduce((acc, post) => {
-    const { catMenu, catCity, category } = post;
-    if (!acc[catMenu]) {
-      acc[catMenu] = {};
-    }
-    if (!acc[catMenu][catCity]) {
-      acc[catMenu][catCity] = [];
-    }
-    if (!acc[catMenu][catCity].includes(category)) {
-      acc[catMenu][catCity].push(category);
-    }
-    return acc;
-  }, {});
+  console.log("allPosts après le filtrage : ", validPosts);
+
+  const filteredPosts = validPosts.filter(
+    (post) => post?.language === "fr" && post?.title?.includes(searchTerm)
+  );
+
+  console.log("filteredPosts : ", filteredPosts);
+
+  const menuData = validPosts.reduce<Record<string, Record<string, string[]>>>(
+    (acc, post) => {
+      const { catMenu, catCity, category } = post;
+      console.log(
+        `catMenu: ${catMenu}, catCity: ${catCity}, category: ${category}`
+      );
+
+      if (catMenu && catCity && category) {
+        if (!acc[catMenu]) {
+          acc[catMenu] = {};
+        }
+        if (!acc[catMenu][catCity]) {
+          acc[catMenu][catCity] = [];
+        }
+        if (!acc[catMenu][catCity].includes(category)) {
+          acc[catMenu][catCity].push(category);
+        }
+      }
+      return acc;
+    },
+    {} as Record<string, Record<string, string[]>>
+  );
+
+  console.log("menuData : ", menuData);
+
   const searchInput = (
     <Input
       aria-label="Search"
@@ -97,14 +112,16 @@ export const Navbar = () => {
               </NavbarItem>
               <DropdownMenu>
                 {Object.keys(menuData[menu]).map((city) => (
-                  <DropdownItem key={city}>
-                    {city}
+                  <Dropdown key={city}>
+                    <DropdownTrigger>
+                      <Button>{city}</Button>
+                    </DropdownTrigger>
                     <DropdownMenu>
                       {menuData[menu][city].map((category) => (
                         <DropdownItem key={category}>{category}</DropdownItem>
                       ))}
                     </DropdownMenu>
-                  </DropdownItem>
+                  </Dropdown>
                 ))}
               </DropdownMenu>
             </Dropdown>
