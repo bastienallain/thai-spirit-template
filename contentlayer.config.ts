@@ -16,17 +16,17 @@ const Post = defineDocumentType(() => ({
       description: 'The date of the post',
       required: true,
     },
-    coverImage: { // Ajout de ce champ
+    coverImage: { 
       type: 'string',
       description: 'The cover image of the post',
       required: true,
     },
-    thumbnailImage:{ // Ajout de ce champ
+    thumbnailImage:{ 
         type: 'string',
         description: 'The cover image of the post',
         required: true,
       },
-    category: { // Ajout de ce champ
+    category: { 
       type: 'string',
       description: 'The category of the post',
       required: true,
