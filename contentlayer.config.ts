@@ -51,6 +51,16 @@ const Post = defineDocumentType(() => ({
         description: 'La langue du post',
         required: true,
       },
+      catMenu: {
+        type: 'string',
+        description: 'The menu category of the post',
+        required: false, 
+      },
+      catCity: {
+        type: 'string',
+        description: 'The city category of the post',
+        required: false, 
+      },
     
   },
   computedFields: {

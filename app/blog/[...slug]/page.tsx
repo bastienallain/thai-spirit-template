@@ -4,23 +4,34 @@ import { getMDXComponent } from "next-contentlayer/hooks";
 import Image from "next/image";
 
 interface ParamsType {
-  slug: string;
+  slug: string[];
 }
-export const generateStaticParams = async () =>
-  allPosts.map((post) => ({ slug: post._raw.flattenedPath.split("/") }));
+
+export const generateStaticParams = async () => {
+  return allPosts.map((post) => ({
+    params: { slug: post._raw.flattenedPath.split("/") },
+  }));
+};
 
 export const generateMetadata = ({ params }: { params: ParamsType }) => {
-  const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
-  return post ? { title: post.title } : { title: "Post Not Found" };
+  const slugAsString = params.slug.join("/");
+  const post = allPosts.find(
+    (post) => post._raw.flattenedPath === slugAsString
+  );
+  return post
+    ? { title: post.title, description: post.metaDescription }
+    : { title: "Post Not Found", description: "Description not found" };
 };
 
 const PostLayout = ({ params }: { params: ParamsType }) => {
-  const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
+  const slugAsString = params.slug.join("/");
+  const post = allPosts.find(
+    (post) => post._raw.flattenedPath === slugAsString
+  );
 
   if (!post) {
     return <div>Post not found</div>;
   }
-
   const Content = getMDXComponent(post.body.code);
 
   return (
@@ -28,7 +39,7 @@ const PostLayout = ({ params }: { params: ParamsType }) => {
       <div className="mb-8 text-center">
         <Image
           alt={post.title}
-          className="z-0 w-full h-full object-cover"
+          className="z-0 w-full h-[45vh] object-contain"
           src={post.coverImage || "/test.jpeg"}
           height={1200}
           width={900}
