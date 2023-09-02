@@ -18,18 +18,39 @@ const Post = defineDocumentType(() => ({
     coverImage: { // Ajout de ce champ
       type: 'string',
       description: 'The cover image of the post',
-      required: false,
+      required: true,
     },
     thumbnailImage:{ // Ajout de ce champ
         type: 'string',
         description: 'The cover image of the post',
-        required: false,
+        required: true,
       },
     category: { // Ajout de ce champ
       type: 'string',
       description: 'The category of the post',
-      required: false,
+      required: true,
     },
+    metaTitle: {
+        type: 'string',
+        description: 'Le titre méta SEO du post',
+        required: true,
+      },
+      metaDescription: {
+        type: 'string',
+        description: 'La description méta SEO du post',
+        required: true,
+      },
+      draft: {
+        type: 'boolean',
+        description: 'Si le post est un brouillon ou non',
+        required: true,
+      },
+      language: {
+        type: 'string',
+        description: 'La langue du post',
+        required: true,
+      },
+    
   },
   computedFields: {
     url: {

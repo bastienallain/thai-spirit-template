@@ -1,36 +1,38 @@
 "use client";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { compareDesc, format, parseISO } from "date-fns";
+import { compareDesc } from "date-fns";
 import { allPosts, Post } from "contentlayer/generated";
-import { getMDXComponent } from "next-contentlayer/hooks";
 import Image from "next/image";
-import {
-  Card,
-  CardHeader,
-  CardBody,
-  CardFooter,
-  Button,
-} from "@nextui-org/react";
+import { Card, CardHeader, CardFooter } from "@nextui-org/react";
 
-// Create a PostCard component to display each post as a card
-function PostCard({ index, post }: { index: number; post: Post }) {
-  const Content = getMDXComponent(post.body.code);
-  const cardClass =
-    index === 0 // Si c'est la première carte
-      ? "md:w-2/3 w-full   h-[300px]" // 2/3 de l'espace sur desktop
-      : index === 1 // Si c'est la deuxième carte
-      ? "md:w-1/3 w-full h-[300px]" // 1/3 de l'espace sur desktop
-      : "md:w-1/3 w-full h-[300px]";
+interface PostCardProps {
+  index: number;
+  post: Post;
+  onLanguageChange: (lang: string) => void;
+}
+
+function PostCard({ index, post, onLanguageChange }: PostCardProps) {
+  useEffect(() => {
+    if (post.language) {
+      onLanguageChange(post.language);
+    }
+  }, [post, onLanguageChange]);
+
+  const isLarge = index % 4 === 0 || index % 4 === 3;
+
   return (
-    <Link href={post.url} className="col-span-12 mb-8 relative block">
-      <Card isFooterBlurred className={cardClass}>
+    <Link
+      href={post.url}
+      style={{
+        gridColumn: isLarge ? "span 8 / auto" : "span 4 / auto",
+        marginBottom: "8px",
+      }}
+    >
+      <Card isFooterBlurred className="w-full h-[300px]">
         <CardHeader className="absolute z-10 top-1 flex-col items-start">
-          <p className="text-tiny text-white/60 uppercase font-bold">
-            Your day your way
-          </p>
-          <h4 className="text-white/90 font-medium text-xl">
-            Your checklist for better sleep
-          </h4>
+          <p className="text-tiny uppercase font-bold">{post.category}</p>
+          <h2 className="font-medium text-xl">{post.title}</h2>
         </CardHeader>
         <Image
           alt="Relaxing app background"
@@ -49,10 +51,7 @@ function PostCard({ index, post }: { index: number; post: Post }) {
               width={900}
             />
             <div className="flex flex-col">
-              <p className="text-tiny text-white/60">Breathing App</p>
-              <p className="text-tiny text-white/60">
-                <Content />
-              </p>
+              <p className="text-tiny">{post.metaDescription}</p>
             </div>
           </div>
         </CardFooter>
@@ -61,18 +60,32 @@ function PostCard({ index, post }: { index: number; post: Post }) {
   );
 }
 
+// Composant BlogPage
 export default function BlogPage() {
-  const posts = allPosts.sort((a, b) =>
-    compareDesc(new Date(a.date), new Date(b.date))
-  );
+  const [currentLanguage, setCurrentLanguage] = useState("en");
+
+  const filteredPosts = allPosts
+    .filter((post) =>
+      process.env.NODE_ENV === "production" ? !post.draft : true
+    )
+    .sort((a, b) => compareDesc(new Date(a.date), new Date(b.date)));
+
+  useEffect(() => {
+    document.documentElement.lang = currentLanguage;
+  }, [currentLanguage]);
 
   return (
-    <div className="max-w-[900px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
+    <div className="max-w-[1600px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
       <h1 className="col-span-12 mb-8 text-3xl font-bold text-center">
         Next.js Example
       </h1>
-      {posts.map((post, idx) => (
-        <PostCard key={idx} index={idx} post={post} />
+      {filteredPosts.map((post, idx) => (
+        <PostCard
+          key={idx}
+          index={idx}
+          post={post}
+          onLanguageChange={(lang: string) => setCurrentLanguage(lang)}
+        />
       ))}
     </div>
   );
