@@ -23,30 +23,33 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const paths = allPosts.map((post) => ({
     params: { slug: post._raw.flattenedPath.split("/") },
   }));
-  return { paths, fallback: false };
+  return { paths, fallback: "blocking" };
 };
 
 export const getStaticProps: GetStaticProps<Props> = async ({ params }) => {
-  try {
-    if (!params || !Array.isArray(params.slug)) {
-      return { props: {} };
+  return new Promise((resolve, reject) => {
+    try {
+      if (!params || !Array.isArray(params.slug)) {
+        resolve({ props: {} });
+        return;
+      }
+      const slugAsString = params.slug.join("/");
+      const post = allPosts.find(
+        (post) => post._raw.flattenedPath === slugAsString
+      );
+      resolve({
+        props: {
+          params: { slug: params.slug },
+          metadata: post
+            ? { title: post.title, description: post.metaDescription }
+            : null,
+        },
+      });
+    } catch (error) {
+      console.error("Error in getStaticProps:", error);
+      reject({ props: {} });
     }
-    const slugAsString = params.slug.join("/");
-    const post = allPosts.find(
-      (post) => post._raw.flattenedPath === slugAsString
-    );
-    return {
-      props: {
-        params: { slug: slugAsString },
-        metadata: post
-          ? { title: post.title, description: post.metaDescription }
-          : null,
-      },
-    };
-  } catch (error) {
-    // handle your error appropriately here
-    return { props: {} };
-  }
+  });
 };
 
 const PostLayout: React.FC<InferGetStaticPropsType<typeof getStaticProps>> = ({
