@@ -2,6 +2,7 @@ import Link from "next/link";
 import { compareDesc, format, parseISO } from "date-fns";
 import { allPosts, Post } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
+import Image from "next/image";
 
 // Create a PostCard component to display each post as a card
 function PostCard(post: Post) {
@@ -18,7 +19,7 @@ function PostCard(post: Post) {
         </p>
         <h2 className="text-white font-medium text-large">{post.title}</h2>
       </div>
-      <img
+      <Image
         alt={post.title}
         className="z-0 w-full h-full object-cover"
         src={post.coverImage || "/default-cover.jpg"}

@@ -1,6 +1,7 @@
 import { format, parseISO } from "date-fns";
 import { allPosts } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
+import Image from "next/image";
 interface ParamsType {
   slug: string;
 }
@@ -24,6 +25,11 @@ const PostLayout = ({ params }: { params: ParamsType }) => {
   return (
     <article className="py-8 mx-auto max-w-xl">
       <div className="mb-8 text-center">
+        <Image
+          alt={post.title}
+          className="z-0 w-full h-full object-cover"
+          src={post.coverImage || "/default-cover.jpg"}
+        />
         <time dateTime={post.date} className="mb-1 text-xs text-gray-600">
           {format(parseISO(post.date), "LLLL d, yyyy")}
         </time>
