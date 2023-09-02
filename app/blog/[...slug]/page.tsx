@@ -2,11 +2,12 @@ import { format, parseISO } from "date-fns";
 import { allPosts } from "contentlayer/generated";
 import { getMDXComponent } from "next-contentlayer/hooks";
 import Image from "next/image";
+
 interface ParamsType {
   slug: string;
 }
 export const generateStaticParams = async () =>
-  allPosts.map((post) => ({ slug: post._raw.flattenedPath }));
+  allPosts.map((post) => ({ slug: post._raw.flattenedPath.split("/") }));
 
 export const generateMetadata = ({ params }: { params: ParamsType }) => {
   const post = allPosts.find((post) => post._raw.flattenedPath === params.slug);
