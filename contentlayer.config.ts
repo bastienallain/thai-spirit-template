@@ -5,6 +5,7 @@ const Post = defineDocumentType(() => ({
   filePathPattern: `**/*.mdx`,
   contentType: 'mdx',
   fields: {
+    
     title: {
       type: 'string',
       description: 'The title of the post',
@@ -55,7 +56,20 @@ const Post = defineDocumentType(() => ({
   computedFields: {
     url: {
       type: 'string',
-      resolve: (doc) => `/blog/${doc._raw.flattenedPath}`,
+      resolve: (doc) => `/blog/${doc._raw.flattenedPath.replace('.mdx', '')}`,
+    },
+    structuredData: {
+      type: 'json',
+      resolve: (doc) => ({
+        '@context': 'https://schema.org',
+        '@type': 'BlogPosting',
+        headline: doc.title,
+        datePublished: doc.date,
+        dateModified: doc.date,
+        description: doc.metaDescription,
+        image: doc.coverImage,
+        url: `/blog/${doc._raw.flattenedPath.replace('.mdx', '')}`,
+      }),
     },
   },
 }))

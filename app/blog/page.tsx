@@ -1,5 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
+import Head from "next/head";
 import Link from "next/link";
 import { compareDesc } from "date-fns";
 import { allPosts, Post } from "contentlayer/generated";
@@ -59,8 +60,17 @@ function PostCard({ index, post, onLanguageChange }: PostCardProps) {
     </Link>
   );
 }
-
-// Composant BlogPage
+export const generateStaticPaths = async () => {
+  const paths = allPosts.map((post) => {
+    return {
+      params: { slug: post._raw.flattenedPath.split("/") },
+    };
+  });
+  return {
+    paths,
+    fallback: false,
+  };
+};
 export default function BlogPage() {
   const [currentLanguage, setCurrentLanguage] = useState("en");
 
@@ -75,18 +85,40 @@ export default function BlogPage() {
   }, [currentLanguage]);
 
   return (
-    <div className="max-w-[1600px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
-      <h1 className="col-span-12 mb-8 text-3xl font-bold text-center">
-        Next.js Example
-      </h1>
-      {filteredPosts.map((post, idx) => (
-        <PostCard
-          key={idx}
-          index={idx}
-          post={post}
-          onLanguageChange={(lang: string) => setCurrentLanguage(lang)}
+    <>
+      <Head>
+        <title>
+          {filteredPosts.length > 0
+            ? filteredPosts[0].metaTitle
+            : "Titre par défaut"}
+        </title>
+        <meta
+          name="description"
+          content={
+            filteredPosts.length > 0
+              ? filteredPosts[0].metaDescription
+              : "Description par défaut"
+          }
         />
-      ))}
-    </div>
+        <script type="application/ld+json">
+          {JSON.stringify(
+            filteredPosts.length > 0 ? filteredPosts[0].structuredData : {}
+          )}
+        </script>
+      </Head>
+      <div className="max-w-[1600px] gap-2 grid grid-cols-12 grid-rows-2 px-8 py-8 mx-auto">
+        <h1 className="col-span-12 mb-8 text-3xl font-bold text-center">
+          Next.js Example
+        </h1>
+        {filteredPosts.map((post, idx) => (
+          <PostCard
+            key={idx}
+            index={idx}
+            post={post}
+            onLanguageChange={(lang: string) => setCurrentLanguage(lang)}
+          />
+        ))}
+      </div>
+    </>
   );
 }
